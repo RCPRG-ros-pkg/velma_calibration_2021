@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+  
+  // First, run the rosbridge:
+  // roslaunch calibration_webapi websocket.launch
+  //
+  // Then, run in bash in the html folder:
+  // python -m SimpleHTTPServer
+
+  var ros = new ROSLIB.Ros({
+    url : 'ws://192.168.18.228:9090'
+  });
+
+  var txt_publisher = new ROSLIB.Topic({
+    ros : ros,
+    name : '/trigger',
+    messageType: 'std_msgs/String'
+  });
+
+  sendMsg = function() {
+    var txt = "hello"; //document.getElementById("usermsg").value;
+    //addSentence(txt, "request", "You");
+    var msg = new ROSLIB.Message({
+      data: txt
+    });
+    txt_publisher.publish(msg);
+    document.getElementById("usermsg").value = "";
+  }
+
+  /*
+  bring = function(m) {
+    var msg = new ROSLIB.Message({
+      data: "Przynieś: " + m
+    });
+    txt_publisher.publish(msg);
+  }
+  
+
+  go_to = function(m) {
+    var msg = new ROSLIB.Message({
+      data: "Idź do: " + m
+    });
+    txt_publisher.publish(msg);
+  }
+  */
+	document.addEventListener("DOMContentLoaded", function(event) { 
+		// Get the input field
+		var input = document.getElementById("usermsg");
+
+		// Execute a function when the user releases a key on the keyboard
+		input.addEventListener("keyup", function(event) {
+		  // Number 13 is the "Enter" key on the keyboard
+		  if (event.keyCode === 13) {
+			// Cancel the default action, if needed
+			event.preventDefault();
+			// Trigger the button element with a click
+			document.getElementById("btnsend").click();
+		  }
+		});
+	});
+</script>
+
+<style>
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
+html, body {
+  position: relative;
+  height: 100%;
+  height: 100vh;
+  background: #cacaca;
+  font-family: "Open Sans", Verdana, Arial, sans-serif;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  margin: 0;
+background: rgb(0,0,0);
+}
+
+.send {
+  width:  100%;
+  height:  100%;
+  font-size: 50px;
+}
+
+</style>
+</head>
+
+<body>
+ 
+				<button id="btnsend" class="send" onClick="sendMsg()">Save measurement</button> 
+ 
+</body>
+</html>
