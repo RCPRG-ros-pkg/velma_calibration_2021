@@ -2,14 +2,13 @@
 # encoding: utf8
 
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String, Int32
 
 import copy
 import sys
 import os
 
 from velma_common import VelmaInterface
-
 class ConfigSaver:
     def __init__(self, filename):
         self.__filename = filename
@@ -104,6 +103,7 @@ class ConfigSaver:
                 lines = f.readlines()
 
                 print('Dataset size: {}'.format( len(lines)-1 ))
+                self.pub.publish( len(lines)-1 )
 
     def poseToStr(self, pose):
         rpy = pose.M.GetRPY()
@@ -129,6 +129,7 @@ class ConfigSaver:
         print('Initialization ok!')
 
         rospy.Subscriber("trigger", String, self.triggerCb)
+        self.pub = rospy.Publisher("saved_positions", Int32, queue_size=10)
 
         rospy.spin()
 
