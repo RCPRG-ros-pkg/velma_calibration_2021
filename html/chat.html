@@ -6,93 +6,131 @@
 <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
 
 <script type="text/javascript" type="text/javascript">
-  
+
+var ros
+var txt_publisher
+
+window.onload = function() {
+
   // First, run the rosbridge:
-  // roslaunch calibration_webapi websocket.launch
+  // roslaunch velma_calibration_2021 websocket.launch
   //
   // Then, run in bash in the html folder:
   // python -m SimpleHTTPServer
+  ros_ip = '192.168.18.228'
+  ros_url = 'ws://' + ros_ip + ':9090'
 
-  var ros = new ROSLIB.Ros({
-    url : 'ws://192.168.18.228:9090'
+  document.getElementById("status").innerHTML = "Connecting to " + ros_url + "..."
+  document.getElementById("stream").src = "http://" + ros_ip + ":8081/stream?topic=/stream_image"
+
+  ros = new ROSLIB.Ros({
+    url : ros_url
   });
 
-  var txt_publisher = new ROSLIB.Topic({
+  ros.on('connection', function() {
+    document.getElementById("status").innerHTML = "Connected to " + ros_url
+  });
+
+  ros.on('error', function(error) {
+    document.getElementById("status").innerHTML = 'Error connecting to websocket server: ' + error;
+  });
+
+  ros.on('close', function() {
+    document.getElementById("status").innerHTML = 'Connection to websocket server closed.';
+  });
+
+  txt_publisher = new ROSLIB.Topic({
     ros : ros,
     name : '/trigger',
     messageType: 'std_msgs/String'
   });
 
+  var listener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/saved_positions',
+    messageType : 'std_msgs/Int32'
+  });
+
+  listener.subscribe(function(message) {
+    document.getElementById("positions").innerHTML = 'Positions: ' + message.data
+  });
+
+  var listener2 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/saved_images',
+    messageType : 'std_msgs/Int32'
+  });
+
+  listener2.subscribe(function(message) {
+    document.getElementById("images").innerHTML = 'Images: ' + message.data
+  });
+}
+
+
   sendMsg = function() {
-    var txt = "hello"; //document.getElementById("usermsg").value;
-    //addSentence(txt, "request", "You");
+    var txt = "hello";
     var msg = new ROSLIB.Message({
       data: txt
     });
     txt_publisher.publish(msg);
-    document.getElementById("usermsg").value = "";
+    console.log(ros)
   }
-
-  /*
-  bring = function(m) {
-    var msg = new ROSLIB.Message({
-      data: "Przynieś: " + m
-    });
-    txt_publisher.publish(msg);
-  }
-  
-
-  go_to = function(m) {
-    var msg = new ROSLIB.Message({
-      data: "Idź do: " + m
-    });
-    txt_publisher.publish(msg);
-  }
-  */
-	document.addEventListener("DOMContentLoaded", function(event) { 
-		// Get the input field
-		var input = document.getElementById("usermsg");
-
-		// Execute a function when the user releases a key on the keyboard
-		input.addEventListener("keyup", function(event) {
-		  // Number 13 is the "Enter" key on the keyboard
-		  if (event.keyCode === 13) {
-			// Cancel the default action, if needed
-			event.preventDefault();
-			// Trigger the button element with a click
-			document.getElementById("btnsend").click();
-		  }
-		});
-	});
 </script>
 
 <style>
-@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
 html, body {
-  position: relative;
   height: 100%;
-  height: 100vh;
+  position: relative;
   background: #cacaca;
-  font-family: "Open Sans", Verdana, Arial, sans-serif;
+  font-family: Verdana, Arial, sans-serif;
   color: #fff;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
+  /*overflow: hidden;*/
   margin: 0;
-background: rgb(0,0,0);
+  padding: 0;
+  background: rgb(0,0,0);
 }
 
 .send {
   width:  100%;
-  height:  100%;
-  font-size: 50px;
+  height:  20%;
+  font-size: 5vh;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+
+}
+
+#status {
+  padding: 1em;
+  text-align: center;
+  font-size: 200%;
+  color: #888;
+}
+
+.info {
+  text-align: center;
+  padding: .1em;
+  font-size: 3vh;
+  display: inline-block;
+  width: 48%;
+}
+
+img {
+  width: 100%;
+
 }
 
 </style>
 </head>
 
 <body>
- 
-				<button id="btnsend" class="send" onClick="sendMsg()">Save measurement</button> 
- 
+  <div id="status">Connecting</div>
+  <div id="positions" class="info">Positions: 0</div>
+  <div id="images" class="info">Images: 0</div>
+  <img id="stream" src=""></img>
+	<button id="btnsend" class="send" onClick="sendMsg()">Save measurement</button>
+
 </body>
+
 </html>
