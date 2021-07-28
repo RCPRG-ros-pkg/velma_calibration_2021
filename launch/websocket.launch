@@ -4,11 +4,11 @@
   
   <!-- Run web video server streaming images over http -->
   <!-- rosrun web_video_server web_video_server _port:=8081 -->
-  <node package="web_video_server" type="web_video_server" name="web_video_server">
+  <node pkg="web_video_server" type="web_video_server" name="web_video_server">
     <param name="port" value="8081"/>
   </node>
 
   <!-- Relay image from the left stereo camera to a stream topic for web video server -->
   <!-- rosrun topic_tools relay /stereo/left/image_color /stream_image -->
-  <node package="topic_tools" type="relay" name="image_stream_relay" args="/stereo/left/image_color /stream_image" />
+  <node pkg="topic_tools" type="relay" name="image_stream_relay" args="/stereo/left/image_color /stream_image" />
 </launch>
