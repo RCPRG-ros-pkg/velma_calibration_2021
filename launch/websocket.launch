@@ -1,11 +1,14 @@
 <launch>
+  <!-- Run websocket server on default port (9090) -->
   <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
   
-  <!--
-  <node pkg="dialogflow" type="talker.py" name="talker" output="screen">
-    <param name="agent_name" value="incare-dialog-agent" />
-    <param name="data_dir" value="$(find dialogflow)/data" />
+  <!-- Run web video server streaming images over http -->
+  <!-- rosrun web_video_server web_video_server _port:=8081 -->
+  <node package="web_video_server" type="web_video_server" name="web_video_server">
+    <param name="port" value="8081"/>
   </node>
 
-  <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>-->
+  <!-- Relay image from the left stereo camera to a stream topic for web video server -->
+  <!-- rosrun topic_tools relay /stereo/left/image_color /stream_image -->
+  <node package="topic_tools" type="relay" name="image_stream_relay" args="/stereo/left/image_color /stream_image" />
 </launch>
