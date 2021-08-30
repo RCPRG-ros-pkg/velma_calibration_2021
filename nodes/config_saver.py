@@ -133,9 +133,16 @@ class ConfigSaver:
 
         rospy.spin()
 
+def printUsage():
+    print('USAGE:\nconfig_saver.py <output_csv_filename>')
+
 def main():
+    if len(sys.argv) != 2:
+        printUsage()
+        return 1
     cs = ConfigSaver(sys.argv[1])
     cs.spin()
+    return 0
 
 if __name__ == '__main__':
-    main()
+    exit( main() )
