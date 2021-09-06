@@ -101,9 +101,13 @@ class ConfigSaver:
 
             with open(self.__filename, 'r') as f:
                 lines = f.readlines()
+                dataset_size = 0
+                for line in lines:
+                    if not line.strip().startswith('#'):
+                        dataset_size += 1
 
-                print('Dataset size: {}'.format( len(lines)-1 ))
-                self.pub.publish( len(lines)-1 )
+                print('Dataset size: {}'.format( dataset_size ))
+                self.pub.publish( dataset_size )
 
     def poseToStr(self, pose):
         rpy = pose.M.GetRPY()
