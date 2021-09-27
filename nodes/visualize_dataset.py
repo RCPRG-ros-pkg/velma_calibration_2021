@@ -127,36 +127,35 @@ class RobotModelTest:
         self.__poses_map[link_name] = pose
         return pose
 
-def getRowRightArmBase():
-#rightArm x(a) y(d) z(alfa) alfa(offset) beta(-) gama(-)
-#calibRightArmBaseLink 0.00011480 0.00078365 1.44169413 0.86175408 -0.78867133 1.49459004
-    axis = PyKDL.Vector(0.86175408, -0.78867133, 1.49459004)
-    angle = axis.Normalize()
-    tx,ty,tz = PyKDL.Vector(0.00011480, 0.00078365, 1.44169413)
-    rr,rp,ry = PyKDL.Rotation.Rot(axis, angle).GetRPY()
-    result = ('torso_link0_right_arm_base_joint', 'torso_link0', 'calib_right_arm_base_link', tx, ty, tz, rr, rp, ry, 'pose')
-    print result
-    return result
-
-def getRowRightNeedle():
-#rightArm x(a) y(d) z(alfa) alfa(offset) beta(-) gama(-)
-#rightNeedleLink -0.00066733 -0.00107678 0.10881621 0.00000000 0.00000000 0.00000000
-    return ('right_needle_joint', 'right_arm_ee_link', 'right_needle_link', -0.00066733, -0.00107678, 0.10881621, 0, 0, 0, 'translation')
-
 def loadVelma():
 
+    # 2021.09.27
+    corrections = [
+        ('torso_link0_right_arm_base_joint', -0.0004, -0.0007, -0.0000, -0.0003, -0.0006, -0.0006),
+        ('right_arm_0_joint',-0.0001),
+        ('right_arm_1_joint',-0.0027),
+        ('right_arm_2_joint',-0.0013),
+        ('right_arm_3_joint',-0.0018),
+        ('right_arm_4_joint',-0.0029),
+        ('right_arm_5_joint',-0.0218),
+        ('right_arm_6_joint',-0.0000),
+        ('right_needle_joint', 0.0011, -0.0008, 0.0006, 0, 0, 0),
+        ('torso_link0_left_arm_base_joint', -0.0006, -0.0015, 0.0000, -0.0004, 0.0003, 0.0009),
+        ('left_arm_0_joint', 0.0008),
+        ('left_arm_1_joint', -0.0020),
+        ('left_arm_2_joint', -0.0016),
+        ('left_arm_3_joint', -0.0006),
+        ('left_arm_4_joint', -0.0024),
+        ('left_arm_5_joint', 0.0221),
+        ('left_arm_6_joint', 0.0000),
+        ('left_needle_joint', -0.0010, 0.0008, -0.0030, 0, 0, 0),
+    ]
 
+    #corrections = []
 
     # joint_name, parent_link, link, d, a, alpha, dtheta
     dh_params = [
         ('torso_0_joint', 'torso_base', 'torso_link0', 0.03, 0, 0, 0 ),
-
-        #('right_arm_0_joint', 'calib_right_arm_base_link', 'right_arm_1_link', 0.3105, 0, -math.pi/2, -0.001 ),
-        #('right_arm_1_joint', 'right_arm_1_link', 'right_arm_2_link', 0, 0, math.pi/2, -0.003 ),
-        #('right_arm_2_joint', 'right_arm_2_link', 'right_arm_3_link', 0.4, 0, math.pi/2, -0.003 ),
-        #('right_arm_3_joint', 'right_arm_3_link', 'right_arm_4_link', 0, 0, -math.pi/2, -0.003 ),
-        #('right_arm_4_joint', 'right_arm_4_link', 'right_arm_5_link', 0.39, 0, -math.pi/2, -0.005 ),
-        #('right_arm_5_joint', 'right_arm_5_link', 'right_arm_6_link', 0, 0, math.pi/2, -0.012 ),
 
         ('right_arm_0_joint', 'calib_right_arm_base_link', 'right_arm_1_link', 0.3105, 0, -math.pi/2, 0 ),
         ('right_arm_1_joint', 'right_arm_1_link', 'right_arm_2_link', 0, 0, math.pi/2, 0 ),
@@ -185,15 +184,39 @@ def loadVelma():
         ('head_tilt_joint_dummy', 'head_tilt_link_dummy', 'head_tilt_link', 0, 0, 0, 0, 0, 0, None),
         ('stereo_left_joint', 'head_tilt_link', 'stereo_left_link', 0.013633, 0.22937, -0.045798, -1.5735, 0.013221, 0.023637, 'pose'),
         ('torso_link0_right_arm_base_joint', 'torso_link0', 'calib_right_arm_base_link', 0.0, -0.000188676, 1.17335, 0.0, -1.0471975512, math.pi/2, 'pose'),
-        #getRowRightArmBase(),
-        #('torso_link0_right_arm_base_joint', 'torso_link0', 'calib_right_arm_base_link', 0.0, -0.000188676, 1.17335, -0.004389375859730863, -1.048038972193825, 1.6668960442880738, 'pose'),
         ('right_arm_ee_joint', 'right_arm_7_link', 'right_arm_ee_link', 0.0, 0.0, 0.078, 0, 0, 0, None),
         ('torso_link0_left_arm_base_joint', 'torso_link0', 'calib_left_arm_base_link', 0.0, 0.000188676, 1.17335, 0.0, 1.0471975512, math.pi/2, 'pose'),
         ('left_arm_ee_joint', 'left_arm_7_link', 'left_arm_ee_link', 0.0, 0.0, 0.078, 0, 0, 0, None),
         ('left_needle_joint', 'left_arm_ee_link', 'left_needle_link', 0.0, 0.0, 0.109, 0, 0, 0, 'translation'),
-        #('right_needle_joint', 'right_arm_ee_link', 'right_needle_link', 0.0, 0.0, 0.112, 0, 0, 0, 'translation'),
-        getRowRightNeedle(),
+        ('right_needle_joint', 'right_arm_ee_link', 'right_needle_link', 0.0, 0.0, 0.112, 0, 0, 0, 'translation'),
     ]
+
+    # Apply corrections
+    dh_params_cor = []
+    for dh in dh_params:
+        found = False
+        for corr in corrections:
+            if dh[0] == corr[0]:
+                dh_cor = (dh[0], dh[1], dh[2], dh[3], dh[4], dh[5], dh[6]+corr[1])
+                dh_params_cor.append(dh_cor)
+                found = True
+                break
+        if not found:
+            dh_params_cor.append(dh)
+    dh_params = dh_params_cor
+
+    fixed_params_cor = []
+    for fx in fixed_params:
+        found = False
+        for corr in corrections:
+            if fx[0] == corr[0]:
+                fx_cor = (fx[0], fx[1], fx[2], fx[3]+corr[1], fx[4]+corr[2], fx[5]+corr[3], fx[6]+corr[4], fx[7]+corr[5], fx[8]+corr[6], fx[9])
+                fixed_params_cor.append(fx_cor)
+                found = True
+                break
+        if not found:
+            fixed_params_cor.append(fx)
+    fixed_params = fixed_params_cor
 
     model = RobotModelTest()
     for joint_name, parent_link, link, d, a, alpha, dtheta in dh_params:
