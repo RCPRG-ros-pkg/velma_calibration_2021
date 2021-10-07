@@ -210,7 +210,15 @@ def loadVelma():
         found = False
         for corr in corrections:
             if fx[0] == corr[0]:
-                fx_cor = (fx[0], fx[1], fx[2], fx[3]+corr[1], fx[4]+corr[2], fx[5]+corr[3], fx[6]+corr[4], fx[7]+corr[5], fx[8]+corr[6], fx[9])
+                fr = PyKDL.Frame(PyKDL.Rotation.RPY(fx[6], fx[7], fx[8]), PyKDL.Vector(fx[3], fx[4], fx[5]))
+                axis_angle_cor = fr.M.GetRot() + PyKDL.Vector(corr[4], corr[5], corr[6])
+                angle = axis_angle_cor.Normalize()
+                axis = axis_angle_cor
+                rr, rp, ry = PyKDL.Rotation.Rot(axis, angle).GetRPY()
+                fx_cor = (fx[0], fx[1], fx[2], fx[3]+corr[1], fx[4]+corr[2], fx[5]+corr[3], rr, rp, ry, fx[9])
+                #fr_cor = PyKDL.Frame( fr.p + PyKDL.Vector(corr[1], corr[2], corr[3]), PyKDL.Rotation.Rot(axis, angle) )
+                #fx_cor = (fx[0], fx[1], fx[2], fx[3]+corr[1], fx[4]+corr[2], fx[5]+corr[3], fx[6]+corr[4], fx[7]+corr[5], fx[8]+corr[6], fx[9])
+                print('corrected: {}'.format(fx_cor))
                 fixed_params_cor.append(fx_cor)
                 found = True
                 break
